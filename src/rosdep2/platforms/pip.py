@@ -96,8 +96,16 @@ def pip_detect(pkgs, exec_fn=None):
     ret_list = []
     for pkg in pkg_list:
         pkg_row = pkg.split('==')
-        if pkg_row[0] in pkgs:
-            ret_list.append(pkg_row[0])
+        installed_pkg = pkg_row[0]
+        installed_version = pkg_row[1] if len(pkg_row) >= 2 else None
+        for required_row in pkgs:
+            splited = required_row.split("==")
+            required_pkg = splited[0]
+            required_version = splited[1] if len(splited) >= 2 else None
+            if installed_pkg == required_pkg:
+                if required_version != installed_version:
+                    break
+                ret_list.append(pkg)
 
     # Try to detect with the return code of `pip show`.
     # This can show the existance of things like `argparse` which
